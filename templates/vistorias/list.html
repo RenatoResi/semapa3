@@ -1,0 +1,26 @@
+{% extends "shared/base.html" %}
+{% block content %}
+  <h1>Vistorias</h1>
+  <a href="{{ url_for('vistorias.create') }}" class="btn btn-success mb-2">Nova Vistoria</a>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th><th>Ordem Serviço</th><th>Data</th><th>Técnico</th><th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for vistoria in vistorias %}
+        <tr>
+          <td>{{ vistoria.id }}</td>
+          <td>{{ vistoria.ordem_servico.id if vistoria.ordem_servico else '-' }}</td>
+          <td>{{ vistoria.data.strftime('%d/%m/%Y') }}</td>
+          <td>{{ vistoria.tecnico.nome if vistoria.tecnico else '-' }}</td>
+          <td>
+            <a href="{{ url_for('vistorias.detail', id=vistoria.id) }}" class="btn btn-info btn-sm">Detalhes</a>
+            <a href="{{ url_for('vistorias.edit', id=vistoria.id) }}" class="btn btn-warning btn-sm">Editar</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

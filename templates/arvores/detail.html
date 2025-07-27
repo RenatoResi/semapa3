@@ -1,0 +1,16 @@
+{% extends "shared/base.html" %}
+{% block title %}Detalhes da Árvore{% endblock %}
+{% block content %}
+  <h2>Detalhes da Árvore</h2>
+  <ul>
+    <li>ID: {{ arvore.id }}</li>
+    <li>Espécie: {{ arvore.especie.nome_cientifico }}</li>
+    <li>Localização: {{ arvore.localizacao }}</li>
+    <li>Fotos: 
+      {% for foto in arvore.fotos %}
+        <img src="{{ url_for('static', filename='uploads/arvore/' ~ arvore.id ~ '/' ~ foto.filename) }}" width="100">
+      {% endfor %}
+    </li>
+  </ul>
+  <a href="{{ url_for('arvores.list') }}" class="btn btn-secondary">Voltar</a>
+{% endblock %}

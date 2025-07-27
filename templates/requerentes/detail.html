@@ -1,0 +1,16 @@
+{% extends "shared/base.html" %}
+{% block content %}
+  <h2>Detalhes do Requerente</h2>
+  <ul>
+    <li>ID: {{ requerente.id }}</li>
+    <li>Nome: {{ requerente.nome }}</li>
+    <li>Tipo: {{ requerente.tipo }}</li>
+    {% if requerente.documento %}
+      <li>Documento: {{ requerente.documento }}</li>
+    {% endif %}
+    {% if requerente.email %}
+      <li>Email: {{ requerente.email }}</li>
+    {% endif %}
+  </ul>
+  <a href="{{ url_for('requerentes.list') }}" class="btn btn-secondary">Voltar</a>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "shared/base.html" %}
+{% block content %}
+  <h2>{{ 'Editar' if requerente else 'Novo' }} Requerente</h2>
+  <form method="post">
+    <div class="form-group">
+      <label>Nome</label>
+      <input type="text" name="nome" class="form-control" value="{{ requerente.nome if requerente else '' }}" required>
+    </div>
+    <div class="form-group">
+      <label>Tipo</label>
+      <select name="tipo" class="form-control">
+        <option value="PF" {% if requerente and requerente.tipo == 'PF' %}selected{% endif %}>Pessoa Física</option>
+        <option value="PJ" {% if requerente and requerente.tipo == 'PJ' %}selected{% endif %}>Pessoa Jurídica</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-success">Salvar</button>
+  </form>
+{% endblock %}

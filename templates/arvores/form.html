@@ -1,0 +1,22 @@
+{% extends "shared/base.html" %}
+{% block title %}{{ 'Editar' if arvore else 'Nova' }} Árvore{% endblock %}
+{% block content %}
+  <h2>{{ 'Editar' if arvore else 'Nova' }} Árvore</h2>
+  <form method="post">
+    <div class="form-group">
+      <label>Espécie</label>
+      <select name="especie_id" class="form-control" required>
+        {% for especie in especies %}
+          <option value="{{ especie.id }}" {% if arvore and arvore.especie_id == especie.id %}selected{% endif %}>
+            {{ especie.nome_cientifico }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Localização</label>
+      <input type="text" name="localizacao" class="form-control" value="{{ arvore.localizacao if arvore else '' }}" required>
+    </div>
+    <button type="submit" class="btn btn-success">Salvar</button>
+  </form>
+{% endblock %}

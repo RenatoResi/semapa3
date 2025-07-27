@@ -1,0 +1,17 @@
+{% extends "shared/base.html" %}
+{% block content %}
+  <h2>Detalhes da Vistoria</h2>
+  <ul>
+    <li>ID: {{ vistoria.id }}</li>
+    <li>Ordem Serviço: {{ vistoria.ordem_servico.id if vistoria.ordem_servico else '-' }}</li>
+    <li>Data: {{ vistoria.data.strftime('%d/%m/%Y') }}</li>
+    <li>Técnico: {{ vistoria.tecnico.nome if vistoria.tecnico else '-' }}</li>
+    <li>Parecer: {{ vistoria.parecer }}</li>
+    <li>Fotos:
+      {% for foto in vistoria.fotos %}
+        <img src="{{ url_for('static', filename='uploads/vistoria/' ~ vistoria.id ~ '/' ~ foto.filename) }}" width="120">
+      {% endfor %}
+    </li>
+  </ul>
+  <a href="{{ url_for('vistorias.list') }}" class="btn btn-secondary">Voltar</a>
+{% endblock %}

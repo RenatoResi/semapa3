@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SEMAPA3{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+</head>
+<body>
+  {% include "shared/navbar.html" %}
+  <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2">
+          {% include "shared/sidebar.html" %}
+        </div>
+        <div class="col-md-10 pt-3">
+          {% include "shared/alert.html" %}
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

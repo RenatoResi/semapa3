@@ -1,0 +1,29 @@
+{% extends "shared/base.html" %}
+{% block title %}Árvores{% endblock %}
+{% block content %}
+  <h1>Árvores</h1>
+  <a href="{{ url_for('arvores.create') }}" class="btn btn-success mb-2">Nova Árvore</a>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th><th>Espécie</th><th>Localização</th><th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for arvore in arvores %}
+        <tr>
+          <td>{{ arvore.id }}</td>
+          <td>{{ arvore.especie.nome_cientifico }}</td>
+          <td>{{ arvore.localizacao }}</td>
+          <td>
+            <a href="{{ url_for('arvores.detail', id=arvore.id) }}" class="btn btn-info btn-sm">Detalhes</a>
+            <a href="{{ url_for('arvores.edit', id=arvore.id) }}" class="btn btn-warning btn-sm">Editar</a>
+            <form action="{{ url_for('arvores.delete', id=arvore.id) }}" method="post" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "shared/base.html" %}
+{% block content %}
+  <h2>{{ 'Editar' if vistoria else 'Nova' }} Vistoria</h2>
+  <form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <label>Ordem de Serviço</label>
+      <select name="ordem_servico_id" class="form-control" required>
+        {% for ordem in ordens %}
+          <option value="{{ ordem.id }}" {% if vistoria and vistoria.ordem_servico_id == ordem.id %}selected{% endif %}>
+            {{ ordem.id }} - {{ ordem.tipo }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Data</label>
+      <input type="date" name="data" class="form-control" value="{{ vistoria.data.strftime('%Y-%m-%d') if vistoria else '' }}" required>
+    </div>
+    <div class="form-group">
+      <label>Fotos</label>
+      <input type="file" name="fotos" class="form-control" multiple>
+    </div>
+    <button type="submit" class="btn btn-success">Salvar</button>
+  </form>
+{% endblock %}

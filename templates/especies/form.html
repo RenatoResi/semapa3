@@ -1,0 +1,16 @@
+{% extends "shared/base.html" %}
+{% block title %}{{ 'Editar' if especie else 'Nova' }} Espécie{% endblock %}
+{% block content %}
+  <h2>{{ 'Editar' if especie else 'Nova' }} Espécie</h2>
+  <form method="post">
+    <div class="form-group">
+      <label>Nome Científico</label>
+      <input type="text" name="nome_cientifico" class="form-control" value="{{ especie.nome_cientifico if especie else '' }}" required>
+    </div>
+    <div class="form-group">
+      <label>Porte</label>
+      <input type="text" name="porte" class="form-control" value="{{ especie.porte if especie else '' }}">
+    </div>
+    <button type="submit" class="btn btn-success">Salvar</button>
+  </form>
+{% endblock %}

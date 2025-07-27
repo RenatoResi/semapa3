@@ -1,0 +1,27 @@
+{% extends "shared/base.html" %}
+{% block title %}Ordens de Serviço{% endblock %}
+{% block content %}
+<h1>Ordens de Serviço</h1>
+<a href="{{ url_for('ordens.create') }}" class="btn btn-success mb-2">Nova Ordem</a>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th><th>Tipo</th><th>Status</th><th>Técnico</th><th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ordem in ordens %}
+      <tr>
+        <td>{{ ordem.id }}</td>
+        <td>{{ ordem.tipo }}</td>
+        <td>{{ ordem.status }}</td>
+        <td>{{ ordem.tecnico.nome if ordem.tecnico else '-' }}</td>
+        <td>
+          <a href="{{ url_for('ordens.detail', id=ordem.id) }}" class="btn btn-info btn-sm">Detalhes</a>
+          <a href="{{ url_for('ordens.edit', id=ordem.id) }}" class="btn btn-warning btn-sm">Editar</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

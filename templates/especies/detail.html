@@ -1,0 +1,12 @@
+{% extends "shared/base.html" %}
+{% block title %}Detalhes da Espécie{% endblock %}
+{% block content %}
+  <h2>Detalhes da Espécie</h2>
+  <ul>
+    <li>ID: {{ especie.id }}</li>
+    <li>Nome Científico: {{ especie.nome_cientifico }}</li>
+    <li>Porte: {{ especie.porte }}</li>
+    <li>Origem: {{ especie.origem }}</li>
+  </ul>
+  <a href="{{ url_for('especies.list') }}" class="btn btn-secondary">Voltar</a>
+{% endblock %}

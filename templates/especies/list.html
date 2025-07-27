@@ -1,0 +1,27 @@
+{% extends "shared/base.html" %}
+{% block title %}Espécies{% endblock %}
+{% block content %}
+  <h1>Espécies</h1>
+  <a href="{{ url_for('especies.create') }}" class="btn btn-success mb-2">Nova Espécie</a>
+  <table class="table table-striped">
+    <thead>
+      <tr><th>ID</th><th>Nome Científico</th><th>Porte</th><th>Ações</th></tr>
+    </thead>
+    <tbody>
+      {% for especie in especies %}
+        <tr>
+          <td>{{ especie.id }}</td>
+          <td>{{ especie.nome_cientifico }}</td>
+          <td>{{ especie.porte }}</td>
+          <td>
+            <a href="{{ url_for('especies.detail', id=especie.id) }}" class="btn btn-info btn-sm">Detalhes</a>
+            <a href="{{ url_for('especies.edit', id=especie.id) }}" class="btn btn-warning btn-sm">Editar</a>
+            <form action="{{ url_for('especies.delete', id=especie.id) }}" method="post" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

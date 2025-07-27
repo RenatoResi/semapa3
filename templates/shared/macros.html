@@ -1,0 +1,11 @@
+{% macro render_field(field, label=None, type="text") %}
+  <div class="form-group">
+    <label>{{ label if label else field.label.text }}</label>
+    {{ field(type=type, class="form-control") }}
+    {% if field.errors %}
+      <div class="text-danger">
+        {% for error in field.errors %}{{ error }}{% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endmacro %}
