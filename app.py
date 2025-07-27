@@ -26,29 +26,75 @@ def create_app(config_class):
     # Registrar error handlers
     register_error_handlers(app)
 
-    # Registrar blueprints
-    from controllers.auth_controller import auth_bp
-    from controllers.dashboard_controller import dashboard_bp
-    from controllers.requerente_controller import requerente_bp
-    from controllers.arvore_controller import arvore_bp
-    from controllers.especie_controller import especie_bp
-    from controllers.requerimento_controller import requerimento_bp
-    from controllers.ordem_servico_controller import ordem_servico_bp
-    from controllers.vistoria_controller import vistoria_bp
-    from controllers.api_controller import api_bp
+    # Registrar blueprints com tratamento de erro
+    try:
+        # Controllers principais
+        from controllers.auth_controller import auth_bp
+        from controllers.dashboard_controller import dashboard_bp
+        
+        # Controllers de entidades
+        from controllers.requerente_controller import requerente_bp
+        from controllers.arvore_controller import arvore_bp
+        from controllers.especie_controller import especie_bp
+        from controllers.requerimento_controller import requerimento_bp
+        from controllers.ordem_servico_controller import ordem_servico_bp
+        from controllers.vistoria_controller import vistoria_bp
+        
+        # API Controller
+        from controllers.api_controller import api_bp
 
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(dashboard_bp)
-    app.register_blueprint(requerente_bp)
-    app.register_blueprint(arvore_bp)
-    app.register_blueprint(especie_bp)
-    app.register_blueprint(requerimento_bp)
-    app.register_blueprint(ordem_servico_bp)
-    app.register_blueprint(vistoria_bp)
-    app.register_blueprint(api_bp)
+        # Registrar todos os blueprints
+        app.register_blueprint(auth_bp)
+        app.register_blueprint(dashboard_bp)
+        app.register_blueprint(requerente_bp)
+        app.register_blueprint(arvore_bp)
+        app.register_blueprint(especie_bp)
+        app.register_blueprint(requerimento_bp)
+        app.register_blueprint(ordem_servico_bp)
+        app.register_blueprint(vistoria_bp)
+        app.register_blueprint(api_bp)
+        
+        print("✅ Todos os blueprints registrados com sucesso!")
+        
+    except ImportError as e:
+        print(f"❌ Erro ao importar blueprint: {e}")
+        raise
 
     # Criar tabelas do banco de dados
     with app.app_context():
-        db.create_all()
+        try:
+            # Importar todos os models antes de criar as tabelas
+            from models import User, Requerente, Especie, Arvore, Requerimento, OrdemServico, Vistoria
+            
+            db.create_all()
+            print("✅ Tabelas do banco criadas com sucesso!")
+            
+            # Criar usuário admin padrão se não existir
+            create_default_admin()
+            
+        except Exception as e:
+            print(f"❌ Erro ao criar tabelas: {e}")
+            raise
 
     return app
+
+def create_default_admin():
+    """Cria usuário administrador padrão"""
+    try:
+        from models.user_model import User
+        from werkzeug.security import generate_password_hash
+        
+        admin = User.query.filter_by(email='admin@semapa.gov.br').first()
+        if not admin:
+            admin = User(
+                nome='Administrador',
+                email='admin@semapa.gov.br',
+                senha_hash=generate_password_hash('123456'),
+                nivel=4,  # Super admin
+                ativo=True
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("✅ Usuário admin padrão criado (admin@semapa.gov.br / 123456)")
+    except Exception as e:
+        print(f"❌ Erro ao criar admin padrão: {e}")

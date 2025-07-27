@@ -1,9 +1,21 @@
-{% extends "shared/base.html" %}
-
-{% block title %}404 - Página Não Encontrada{% endblock %}
-
-{% block content %}
-<h1>404 - Página Não Encontrada</h1>
-<p>Desculpe, a página que você está procurando não existe.</p>
-<a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">Voltar ao Início</a>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>404 - Página Não Encontrada - SEMAPA3</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error-container { max-width: 500px; margin: 0 auto; }
+        h1 { color: #dc3545; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>404 - Página Não Encontrada</h1>
+        <p>A página que você está procurando não existe ou foi removida.</p>
+        <a href="/" class="btn">Voltar ao Início</a>
+    </div>
+</body>
+</html>

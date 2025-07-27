@@ -1,9 +1,21 @@
-{% extends "shared/base.html" %}
-
-{% block title %}500 - Erro Interno do Servidor{% endblock %}
-
-{% block content %}
-<h1>500 - Erro Interno do Servidor</h1>
-<p>Algo deu errado no servidor. Por favor tente novamente mais tarde.</p>
-<a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">Voltar ao Início</a>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>500 - Erro Interno - SEMAPA3</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error-container { max-width: 500px; margin: 0 auto; }
+        h1 { color: #dc3545; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>500 - Erro Interno do Servidor</h1>
+        <p>Algo deu errado no servidor. Nossa equipe foi notificada.</p>
+        <a href="/" class="btn">Voltar ao Início</a>
+    </div>
+</body>
+</html>

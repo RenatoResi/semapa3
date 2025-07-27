@@ -1,8 +1,23 @@
 <div class="list-group">
-  <a href="{{ url_for('dashboard.index') }}" class="list-group-item list-group-item-action">Dashboard</a>
-  <a href="{{ url_for('requerentes.list') }}" class="list-group-item list-group-item-action">Requerentes</a>
-  <a href="{{ url_for('arvores.list') }}" class="list-group-item list-group-item-action">Árvores</a>
-  <a href="{{ url_for('especies.list') }}" class="list-group-item list-group-item-action">Espécies</a>
-  <a href="{{ url_for('ordens.list') }}" class="list-group-item list-group-item-action">Ordens de Serviço</a>
-  <a href="{{ url_for('vistorias.list') }}" class="list-group-item list-group-item-action">Vistorias</a>
+  <a href="{{ url_for('dashboard.index') }}" class="list-group-item list-group-item-action">
+    <i class="fas fa-tachometer-alt"></i> Dashboard
+  </a>
+  <a href="{{ url_for('requerente.index') }}" class="list-group-item list-group-item-action">
+    <i class="fas fa-users"></i> Requerentes
+  </a>
+  <a href="{{ url_for('arvore.index') }}" class="list-group-item list-group-item-action">
+    <i class="fas fa-tree"></i> Árvores
+  </a>
+  <a href="{{ url_for('especie.index') }}" class="list-group-item list-group-item-action">
+    <i class="fas fa-leaf"></i> Espécies
+  </a>
+  <a href="{{ url_for('requerimento.index') }}" class="list-group-item list-group-item-action">
+    <i class="fas fa-file-alt"></i> Requerimentos
+  </a>
+  <a href="{{ url_for('ordem_servico.index') }}" class="list-group-item list-group-item-action">
+    <i class="fas fa-clipboard-list"></i> Ordens de Serviço
+  </a>
+  <a href="{{ url_for('vistoria.index') }}" class="list-group-item list-group-item-action">
+    <i class="fas fa-search"></i> Vistorias
+  </a>
 </div>

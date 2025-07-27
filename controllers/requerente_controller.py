@@ -1,124 +1,109 @@
 # -*- coding: utf-8 -*-
 """
 SEMAPA3 - Requerente Controller
-Controller de gerenciamento de requerentes
+Controller para gestão de requerentes
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from flask_login import login_required
-from services.requerente_service import RequerenteService
-from core.exceptions import ValidationError, NotFoundError
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, current_app
+from flask_login import login_required, current_user
 from core.security import require_role
+from services.requerente_service import RequerenteService
+from utils.validators import validate_cpf, validate_cnpj, validate_email
+from utils.helpers import format_document
 
+# CORREÇÃO: Blueprint com nome 'requerente' (singular)
 requerente_bp = Blueprint('requerente', __name__, url_prefix='/requerentes')
 
 @requerente_bp.route('/')
 @login_required
+@require_role(1)
 def index():
-    """Lista de requerentes"""
-    page = request.args.get('page', 1, type=int)
-    search = request.args.get('search', '')
-
+    """Lista todos os requerentes"""
     try:
-        if search:
-            requerentes, total = RequerenteService.search(search, page=page)
-        else:
-            requerentes, total = RequerenteService.get_all(page=page)
-
-        return render_template('requerentes/index.html',
-                             requerentes=requerentes,
-                             total=total,
-                             search=search,
-                             page=page)
+        page = request.args.get('page', 1, type=int)
+        per_page = current_app.config.get('ITEMS_PER_PAGE', 20)
+        
+        # Filtros
+        tipo = request.args.get('tipo')
+        search = request.args.get('search', '').strip()
+        
+        requerentes = RequerenteService.get_paginated(
+            page=page,
+            per_page=per_page,
+            tipo=tipo,
+            search=search
+        )
+        
+        return render_template('requerentes/index.html', requerentes=requerentes)
+        
     except Exception as e:
-        flash(f'Erro ao carregar requerentes: {str(e)}', 'error')
-        return render_template('requerentes/index.html', requerentes=[], total=0)
+        current_app.logger.error(f"Erro ao listar requerentes: {str(e)}")
+        flash('Erro ao carregar lista de requerentes', 'error')
+        return render_template('requerentes/index.html', requerentes=None)
 
-@requerente_bp.route('/new', methods=['GET', 'POST'])
+@requerente_bp.route('/novo')
 @login_required
-@require_role('tecnico')
-def create():
-    """Criar novo requerente"""
-    if request.method == 'POST':
-        try:
-            requerente = RequerenteService.create(
-                nome=request.form.get('nome'),
-                cpf_cnpj=request.form.get('cpf_cnpj'),
-                tipo=request.form.get('tipo'),
-                telefone=request.form.get('telefone'),
-                email=request.form.get('email'),
-                endereco=request.form.get('endereco')
-            )
+@require_role(2)
+def novo():
+    """Formulário para novo requerente"""
+    return render_template('requerentes/form.html', requerente=None)
 
-            flash('Requerente cadastrado com sucesso!', 'success')
-            return redirect(url_for('requerente.view', id=requerente.id))
-
-        except ValidationError as e:
-            flash(str(e), 'error')
-
-    return render_template('requerentes/form.html')
+@requerente_bp.route('/criar', methods=['POST'])
+@login_required
+@require_role(2)
+def criar():
+    """Cria novo requerente"""
+    try:
+        data = {
+            'nome': request.form.get('nome', '').strip(),
+            'tipo': request.form.get('tipo'),
+            'documento': request.form.get('documento', '').strip(),
+            'email': request.form.get('email', '').strip(),
+            'telefone': request.form.get('telefone', '').strip(),
+            'endereco': request.form.get('endereco', '').strip(),
+            'created_by': current_user.id
+        }
+        
+        # Validações
+        if not data['nome']:
+            flash('Nome é obrigatório', 'error')
+            return render_template('requerentes/form.html', requerente=None)
+            
+        if data['tipo'] == 'PF' and not validate_cpf(data['documento']):
+            flash('CPF inválido', 'error')
+            return render_template('requerentes/form.html', requerente=None)
+            
+        if data['tipo'] == 'PJ' and not validate_cnpj(data['documento']):
+            flash('CNPJ inválido', 'error')
+            return render_template('requerentes/form.html', requerente=None)
+        
+        # Criar requerente
+        requerente = RequerenteService.create(data)
+        
+        flash('Requerente cadastrado com sucesso!', 'success')
+        return redirect(url_for('requerente.detalhes', id=requerente.id))
+        
+    except Exception as e:
+        current_app.logger.error(f"Erro ao criar requerente: {str(e)}")
+        flash('Erro ao cadastrar requerente', 'error')
+        return render_template('requerentes/form.html', requerente=None)
 
 @requerente_bp.route('/<int:id>')
 @login_required
-def view(id):
-    """Visualizar requerente"""
+@require_role(1)
+def detalhes(id):
+    """Exibe detalhes de um requerente"""
     try:
         requerente = RequerenteService.get_by_id(id)
-        return render_template('requerentes/view.html', requerente=requerente)
-    except NotFoundError as e:
-        flash(str(e), 'error')
+        if not requerente:
+            flash('Requerente não encontrado', 'error')
+            return redirect(url_for('requerente.index'))
+            
+        return render_template('requerentes/detalhes.html', requerente=requerente)
+        
+    except Exception as e:
+        current_app.logger.error(f"Erro ao carregar requerente {id}: {str(e)}")
+        flash('Erro ao carregar requerente', 'error')
         return redirect(url_for('requerente.index'))
 
-@requerente_bp.route('/<int:id>/edit', methods=['GET', 'POST'])
-@login_required
-@require_role('tecnico')
-def edit(id):
-    """Editar requerente"""
-    try:
-        requerente = RequerenteService.get_by_id(id)
-
-        if request.method == 'POST':
-            RequerenteService.update(id, **{
-                'nome': request.form.get('nome'),
-                'telefone': request.form.get('telefone'),
-                'email': request.form.get('email'),
-                'endereco': request.form.get('endereco')
-            })
-
-            flash('Requerente atualizado com sucesso!', 'success')
-            return redirect(url_for('requerente.view', id=id))
-
-        return render_template('requerentes/form.html', requerente=requerente, editing=True)
-
-    except (NotFoundError, ValidationError) as e:
-        flash(str(e), 'error')
-        return redirect(url_for('requerente.index'))
-
-@requerente_bp.route('/<int:id>/delete', methods=['POST'])
-@login_required
-@require_role('admin')
-def delete(id):
-    """Excluir requerente"""
-    try:
-        RequerenteService.delete(id)
-        flash('Requerente excluído com sucesso!', 'success')
-    except (NotFoundError, ValidationError) as e:
-        flash(str(e), 'error')
-
-    return redirect(url_for('requerente.index'))
-
-@requerente_bp.route('/api/search')
-@login_required
-def api_search():
-    """API de busca de requerentes"""
-    query = request.args.get('q', '')
-    try:
-        requerentes, _ = RequerenteService.search(query, per_page=10)
-        return jsonify([{
-            'id': r.id,
-            'nome': r.nome,
-            'cpf_cnpj': r.cpf_cnpj,
-            'tipo': r.tipo
-        } for r in requerentes])
-    except Exception:
-        return jsonify([])
+# Adicionar outras rotas necessárias...

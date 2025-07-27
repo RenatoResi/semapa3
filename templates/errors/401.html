@@ -1,9 +1,22 @@
-{% extends "shared/base.html" %}
-
-{% block title %}401 - Não Autorizado{% endblock %}
-
-{% block content %}
-<h1>401 - Não Autorizado</h1>
-<p>Você precisa fazer login para acessar esta página.</p>
-<a href="{{ url_for('auth.login') }}" class="btn btn-primary">Entrar</a>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>401 - Não Autorizado - SEMAPA3</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error-container { max-width: 500px; margin: 0 auto; }
+        h1 { color: #dc3545; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>401 - Não Autorizado</h1>
+        <p>Você precisa fazer login para acessar esta página.</p>
+        <a href="/auth/login" class="btn">Fazer Login</a>
+        <a href="/" class="btn">Voltar ao Início</a>
+    </div>
+</body>
+</html>

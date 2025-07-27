@@ -1,67 +1,51 @@
 # -*- coding: utf-8 -*-
 """
 SEMAPA3 - Core Security
-Configurações de segurança, autenticação e autorização
+Sistema de autenticação e autorização
 """
 
 from flask_login import LoginManager, UserMixin
 from flask_wtf.csrf import CSRFProtect
 from functools import wraps
-from flask import abort, current_app
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import abort
+from flask_login import current_user
 
 # Instâncias globais
 login_manager = LoginManager()
 csrf = CSRFProtect()
 
+# Configurações do Flask-Login
+login_manager.login_view = 'auth.login'
+login_manager.login_message = 'Faça login para acessar esta página.'
+login_manager.login_message_category = 'info'
+
 @login_manager.user_loader
 def load_user(user_id):
-    """Carrega usuário para Flask-Login"""
+    """Carrega usuário pelo ID"""
+    # Import local para evitar importação circular
     from models.user_model import User
     return User.query.get(int(user_id))
 
-def require_role(role):
-    """Decorator para verificar nível de acesso do usuário"""
+def require_role(min_level):
+    """Decorator para controle de acesso por nível"""
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            from flask_login import current_user
             if not current_user.is_authenticated:
-                return login_manager.unauthorized()
-
-            role_hierarchy = {
-                'user': 1,
-                'tecnico': 2,
-                'admin': 3,
-                'super_admin': 4
-            }
-
-            required_level = role_hierarchy.get(role, 0)
-            user_level = role_hierarchy.get(current_user.nivel, 0)
-
-            if user_level < required_level:
+                abort(401)
+            if current_user.nivel < min_level:
                 abort(403)
-
             return f(*args, **kwargs)
         return decorated_function
     return decorator
 
 class SecurityMixin:
-    """Mixin para funcionalidades de segurança em modelos"""
-
-    @staticmethod
-    def hash_password(password):
-        """Gera hash da senha"""
-        return generate_password_hash(password)
-
-    def check_password(self, password):
-        """Verifica se a senha está correta"""
-        return check_password_hash(self.senha, password)
-
-    def is_admin(self):
-        """Verifica se o usuário é admin"""
-        return self.nivel in ['admin', 'super_admin']
-
-    def is_tecnico(self):
-        """Verifica se o usuário é técnico ou superior"""
-        return self.nivel in ['tecnico', 'admin', 'super_admin']
+    """Mixin para adicionar funcionalidades de segurança aos models"""
+    
+    def can_edit(self, user):
+        """Verifica se usuário pode editar este registro"""
+        return user.nivel >= 2 or self.created_by == user.id
+    
+    def can_delete(self, user):
+        """Verifica se usuário pode deletar este registro"""
+        return user.nivel >= 3 or self.created_by == user.id
