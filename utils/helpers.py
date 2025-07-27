@@ -22,3 +22,13 @@ def save_uploaded_file(file, folder):
         file.save(os.path.join(upload_path, filename))
         return filename
     return None
+
+def format_document(document):
+    """Formata documentos como CPF ou CNPJ"""
+    import re
+    document = re.sub(r'\D', '', document)
+    if len(document) == 11:  # CPF
+        return f"{document[:3]}.{document[3:6]}.{document[6:9]}-{document[9:]}"
+    elif len(document) == 14:  # CNPJ
+        return f"{document[:2]}.{document[2:5]}.{document[5:8]}/{document[8:12]}-{document[12:]}"
+    return document

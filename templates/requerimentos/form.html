@@ -1,0 +1,74 @@
+{% extends "shared/base.html" %}
+
+{% block title %}{{ 'Editar' if requerimento else 'Novo' }} Requerimento{% endblock %}
+
+{% block content %}
+<h2>{{ 'Editar' if requerimento else 'Novo' }} Requerimento</h2>
+
+<form method="post">
+  <div class="form-group">
+    <label for="numero">Número</label>
+    <input type="text" name="numero" id="numero" class="form-control" 
+           value="{{ requerimento.numero if requerimento else '' }}" {% if requerimento %}readonly{% endif %}>
+           <!-- Número normalmente gerado automaticamente no backend -->
+  </div>
+
+  <div class="form-group">
+    <label for="tipo">Tipo</label>
+    <input type="text" name="tipo" id="tipo" class="form-control" 
+           value="{{ requerimento.tipo if requerimento else '' }}" required>
+  </div>
+
+  <div class="form-group">
+    <label for="motivo">Motivo</label>
+    <textarea name="motivo" id="motivo" class="form-control" rows="3">{{ requerimento.motivo if requerimento else '' }}</textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="status">Status</label>
+    <select name="status" id="status" class="form-control" required>
+      <option value="pendente" {% if requerimento and requerimento.status == 'pendente' %}selected{% endif %}>Pendente</option>
+      <option value="aprovado" {% if requerimento and requerimento.status == 'aprovado' %}selected{% endif %}>Aprovado</option>
+      <option value="negado" {% if requerimento and requerimento.status == 'negado' %}selected{% endif %}>Negado</option>
+      <option value="concluido" {% if requerimento and requerimento.status == 'concluido' %}selected{% endif %}>Concluído</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="prioridade">Prioridade</label>
+    <select name="prioridade" id="prioridade" class="form-control">
+      <option value="" {% if not requerimento or not requerimento.prioridade %}selected{% endif %}>-- Selecione --</option>
+      <option value="baixa" {% if requerimento and requerimento.prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+      <option value="media" {% if requerimento and requerimento.prioridade == 'media' %}selected{% endif %}>Média</option>
+      <option value="alta" {% if requerimento and requerimento.prioridade == 'alta' %}selected{% endif %}>Alta</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="requerente_id">Requerente</label>
+    <select name="requerente_id" id="requerente_id" class="form-control" required>
+      {% for r in requerentes %}
+        <option value="{{ r.id }}" {% if requerimento and requerimento.requerente_id == r.id %}selected{% endif %}>{{ r.nome }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="arvore_id">Árvore</label>
+    <select name="arvore_id" id="arvore_id" class="form-control" required>
+      {% for a in arvores %}
+        <option value="{{ a.id }}" {% if requerimento and requerimento.arvore_id == a.id %}selected{% endif %}>{{ a.id }} - {{ a.localizacao }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="observacao">Observação</label>
+    <textarea name="observacao" id="observacao" class="form-control" rows="3">{{ requerimento.observacao if requerimento else '' }}</textarea>
+  </div>
+
+  <button type="submit" class="btn btn-success">Salvar</button>
+  <a href="{{ url_for('requerimento.list') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+{% endblock %}

@@ -33,3 +33,26 @@ def validate_date(date_str, date_format='%Y-%m-%d'):
         datetime.strptime(date_str, date_format)
     except ValueError:
         raise ValueError(f'Data inválida, deve estar no formato {date_format}')
+    
+def validate_cpf(cpf):
+    import re
+    cpf = re.sub(r'\D', '', cpf)
+    if len(cpf) != 11 or not cpf.isdigit():
+        return False
+    # Lógica de validação do CPF (simplificada)
+    return True
+
+def validate_cnpj(cnpj):
+    import re
+    cnpj = re.sub(r'\D', '', cnpj)
+    if len(cnpj) != 14 or not cnpj.isdigit():
+        return False
+    # Lógica de validação do CNPJ (simplificada)
+    return True
+
+def validate_email(email):
+    import re
+    email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if not re.match(email_regex, email):
+        raise ValueError('Email inválido')
+    return True

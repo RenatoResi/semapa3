@@ -1,0 +1,44 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Requerimentos{% endblock %}
+
+{% block content %}
+<h1>Requerimentos</h1>
+<a href="{{ url_for('requerimento.create') }}" class="btn btn-success mb-3">Novo Requerimento</a>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Número</th>
+      <th>Tipo</th>
+      <th>Status</th>
+      <th>Prioridade</th>
+      <th>Data Abertura</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for req in requerimentos %}
+      <tr>
+        <td>{{ req.id }}</td>
+        <td>{{ req.numero or '-' }}</td>
+        <td>{{ req.tipo or '-' }}</td>
+        <td>{{ req.status or '-' }}</td>
+        <td>{{ req.prioridade or '-' }}</td>
+        <td>{{ req.data_abertura.strftime('%d/%m/%Y') if req.data_abertura else '-' }}</td>
+        <td>
+          <a href="{{ url_for('requerimento.detail', id=req.id) }}" class="btn btn-info btn-sm">Detalhes</a>
+          {% if req.pode_editar %}
+            <a href="{{ url_for('requerimento.edit', id=req.id) }}" class="btn btn-warning btn-sm">Editar</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="7" class="text-center">Nenhum requerimento encontrado.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

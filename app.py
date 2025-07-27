@@ -64,7 +64,7 @@ def create_app(config_class):
     with app.app_context():
         try:
             # Importar todos os models antes de criar as tabelas
-            from models import User, Requerente, Especie, Arvore, Requerimento, OrdemServico, Vistoria
+            from models import user_model, requerente_model, especie_model, arvore_model, requerimento_model, ordem_model, vistoria_model
             
             db.create_all()
             print("✅ Tabelas do banco criadas com sucesso!")
@@ -89,8 +89,8 @@ def create_default_admin():
             admin = User(
                 nome='Administrador',
                 email='admin@semapa.gov.br',
-                senha_hash=generate_password_hash('123456'),
-                nivel=4,  # Super admin
+                password='123456',
+                nivel=1,  # Super admin
                 ativo=True
             )
             db.session.add(admin)

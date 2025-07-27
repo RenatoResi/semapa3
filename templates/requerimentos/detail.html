@@ -1,0 +1,26 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Detalhes do Requerimento {{ requerimento.numero }}{% endblock %}
+
+{% block content %}
+<h2>Detalhes do Requerimento</h2>
+
+<ul class="list-group">
+  <li class="list-group-item"><strong>ID:</strong> {{ requerimento.id }}</li>
+  <li class="list-group-item"><strong>Número:</strong> {{ requerimento.numero or '-' }}</li>
+  <li class="list-group-item"><strong>Tipo:</strong> {{ requerimento.tipo or '-' }}</li>
+  <li class="list-group-item"><strong>Motivo:</strong> {{ requerimento.motivo or '-' }}</li>
+  <li class="list-group-item"><strong>Status:</strong> {{ requerimento.status or '-' }}</li>
+  <li class="list-group-item"><strong>Prioridade:</strong> {{ requerimento.prioridade or '-' }}</li>
+  <li class="list-group-item"><strong>Data de Abertura:</strong> {{ requerimento.data_abertura.strftime('%d/%m/%Y') if requerimento.data_abertura else '-' }}</li>
+  <li class="list-group-item"><strong>Requerente:</strong> {{ requerimento.requerente.nome if requerimento.requerente else '---' }}</li>
+  <li class="list-group-item"><strong>Árvore:</strong> {{ requerimento.arvore.localizacao if requerimento.arvore else '---' }}</li>
+  <li class="list-group-item"><strong>Observação:</strong> {{ requerimento.observacao or '-' }}</li>
+  <li class="list-group-item"><strong>Criado Por:</strong> {{ requerimento.criado_por_user.nome if requerimento.criado_por_user else '-' }}</li>
+  <li class="list-group-item"><strong>Data Criação:</strong> {{ requerimento.data_criacao.strftime('%d/%m/%Y %H:%M:%S') if requerimento.data_criacao else '-' }}</li>
+  <li class="list-group-item"><strong>Atualizado Por:</strong> {{ requerimento.atualizado_por_user.nome if requerimento.atualizado_por_user else '-' }}</li>
+  <li class="list-group-item"><strong>Data Atualização:</strong> {{ requerimento.data_atualizacao.strftime('%d/%m/%Y %H:%M:%S') if requerimento.data_atualizacao else '-' }}</li>
+</ul>
+
+<a href="{{ url_for('requerimento.list') }}" class="btn btn-secondary mt-3">Voltar</a>
+{% endblock %}
