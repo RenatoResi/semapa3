@@ -1,0 +1,24 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Registrar Usuário{% endblock %}
+
+{% block content %}
+<h2>Registrar Novo Usuário</h2>
+
+<form method="post">
+  <div class="form-group">
+    <label for="nome">Nome</label>
+    <input type="text" class="form-control" id="nome" name="nome" required>
+  </div>
+  <div class="form-group">
+    <label for="email">Email</label>
+    <input type="email" class="form-control" id="email" name="email" required>
+  </div>
+  <div class="form-group">
+    <label for="senha">Senha</label>
+    <input type="password" class="form-control" id="senha" name="senha" required>
+  </div>
+  <button type="submit" class="btn btn-success">Registrar</button>
+  <a href="{{ url_for('auth.login') }}" class="btn btn-link">Já possui conta? Login</a>
+</form>
+{% endblock %}

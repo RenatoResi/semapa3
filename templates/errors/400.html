@@ -1,0 +1,9 @@
+{% extends "shared/base.html" %}
+
+{% block title %}400 - Requisição Inválida{% endblock %}
+
+{% block content %}
+<h1>400 - Requisição Inválida</h1>
+<p>Oops! A sua requisição é inválida ou não pode ser processada.</p>
+<a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">Voltar ao Início</a>
+{% endblock %}

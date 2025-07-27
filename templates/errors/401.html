@@ -1,0 +1,9 @@
+{% extends "shared/base.html" %}
+
+{% block title %}401 - Não Autorizado{% endblock %}
+
+{% block content %}
+<h1>401 - Não Autorizado</h1>
+<p>Você precisa fazer login para acessar esta página.</p>
+<a href="{{ url_for('auth.login') }}" class="btn btn-primary">Entrar</a>
+{% endblock %}

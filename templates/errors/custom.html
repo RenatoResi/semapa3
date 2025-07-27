@@ -1,0 +1,9 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Erro Personalizado{% endblock %}
+
+{% block content %}
+<h1>Erro</h1>
+<p>{{ message or "Ocorreu um erro inesperado." }}</p>
+<a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">Voltar ao Início</a>
+{% endblock %}
