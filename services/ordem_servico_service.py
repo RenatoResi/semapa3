@@ -1,4 +1,4 @@
-from models.ordem_model import OrdemServico
+from models.ordem_servico_model import OrdemServico
 from core.database import db
 from utils.validators import validate_ordem_servico
 

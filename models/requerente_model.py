@@ -1,53 +1,68 @@
 # -*- coding: utf-8 -*-
 """
 SEMAPA3 - Requerente Model
-Modelo para gerenciamento de requerentes
+Modelo de requerente ajustado conforme DDL da tabela requerentes
 """
 
 from core.database import db, BaseModel
+from datetime import datetime
 from sqlalchemy import or_
+
 
 class Requerente(BaseModel):
     """Modelo de requerente"""
     __tablename__ = 'requerentes'
 
-    nome = db.Column(db.String(100), nullable=False, index=True)
-    cpf_cnpj = db.Column(db.String(20), unique=True, nullable=False, index=True)
-    tipo = db.Column(db.String(10), nullable=False)  # 'pf' ou 'pj'
-    telefone = db.Column(db.String(20))
-    email = db.Column(db.String(120))
-    endereco = db.Column(db.Text)
+    nome = db.Column(db.String(100), nullable=True)
+    telefone = db.Column(db.String(20), nullable=True)
+    observacao = db.Column(db.Text, nullable=True)
+    data_criacao = db.Column(db.DateTime, nullable=True)
+    criado_por = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    data_atualizacao = db.Column(db.DateTime, nullable=True)
+    atualizado_por = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # Relacionamentos
-    requerimentos = db.relationship('Requerimento', backref='requerente', lazy=True, cascade='all, delete-orphan')
+    requerimentos = db.relationship('Requerimento', backref='requerente', lazy=True)
 
-    def __init__(self, nome, cpf_cnpj, tipo, telefone=None, email=None, endereco=None):
+    def __init__(self, nome=None, telefone=None, observacao=None, criado_por=None):
         self.nome = nome
-        self.cpf_cnpj = cpf_cnpj
-        self.tipo = tipo
         self.telefone = telefone
-        self.email = email
-        self.endereco = endereco
+        self.observacao = observacao
+        self.data_criacao = datetime.utcnow()
+        self.criado_por = criado_por
 
     @classmethod
     def search(cls, query):
-        """Busca requerentes por nome ou CPF/CNPJ"""
+        """Busca requerentes por nome ou telefone"""
         return cls.query.filter(
             or_(
                 cls.nome.contains(query),
-                cls.cpf_cnpj.contains(query)
+                cls.telefone.contains(query)
             )
         ).all()
 
     @classmethod
-    def find_by_cpf_cnpj(cls, cpf_cnpj):
-        """Busca requerente por CPF/CNPJ"""
-        return cls.query.filter_by(cpf_cnpj=cpf_cnpj).first()
+    def find_by_telefone(cls, telefone):
+        """Busca requerente por telefone"""
+        return cls.query.filter_by(telefone=telefone).first()
 
     @property
     def total_requerimentos(self):
         """Retorna total de requerimentos do requerente"""
         return len(self.requerimentos)
+
+    @property
+    def ultimo_requerimento(self):
+        """Retorna o requerimento mais recente"""
+        if self.requerimentos:
+            return max(self.requerimentos, key=lambda r: r.data_criacao or datetime.min)
+        return None
+
+    def to_dict(self):
+        """Converte para dicionário"""
+        data = super().to_dict()
+        data['total_requerimentos'] = self.total_requerimentos
+        return data
 
     def __repr__(self):
         return f'<Requerente {self.nome}>'

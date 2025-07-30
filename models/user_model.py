@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-SEMAPA3 - User Model compatível com tabela existente e colunas adicionais
+SEMAPA3 - User Model
+Modelo de usuario ajustado conforme DDL da tabela users
 """
-
+from core.database import db, BaseModel
 from flask_login import UserMixin
 from core.database import db, BaseModel
 from core.security import SecurityMixin
@@ -13,17 +14,16 @@ class User(BaseModel, UserMixin, SecurityMixin):
     """Modelo de usuário do sistema"""
     __tablename__ = 'users'
 
-    nome = db.Column(db.String(100), nullable=True)  # nullable para não quebrar dados existentes
     email = db.Column(db.String(100), unique=True, nullable=False, index=True)
     password = db.Column(db.String(200), nullable=False)
+    nome = db.Column(db.String(100), nullable=True)
     telefone = db.Column(db.String(20), nullable=True)
-    nivel = db.Column(db.Integer, nullable=False, default=3)  # int na tabela, default 3 = usuário normal
-    ativo = db.Column(db.Boolean, nullable=True, default=True)  # novo campo
-    ultimo_login = db.Column(db.DateTime, nullable=True)       # novo campo
+    nivel = db.Column(db.Integer, nullable=False, default=1)
+    ativo = db.Column(db.Boolean, nullable=True, default=True)
+    ultimo_login = db.Column(db.DateTime, nullable=True)
 
-    # Relacionamentos (mantidos iguais)
-    vistorias = db.relationship('Vistoria', backref='tecnico', lazy=True)
-    requerimentos = db.relationship(
+    # Relacionamentos com foreign_keys especificadas para evitar ambiguidade
+    requerimentos_criados = db.relationship(
         'Requerimento',
         backref='criador',
         lazy=True,
@@ -35,11 +35,57 @@ class User(BaseModel, UserMixin, SecurityMixin):
         lazy=True,
         foreign_keys='Requerimento.atualizado_por'
     )
+    
+    arvores_criadas = db.relationship(
+        'Arvore',
+        backref='criador',
+        lazy=True,
+        foreign_keys='Arvore.criado_por'
+    )
+    arvores_atualizadas = db.relationship(
+        'Arvore',
+        backref='atualizador',
+        lazy=True,
+        foreign_keys='Arvore.atualizado_por'
+    )
+    
+    requerentes_criados = db.relationship(
+        'Requerente',
+        backref='criador',
+        lazy=True,
+        foreign_keys='Requerente.criado_por'
+    )
+    requerentes_atualizados = db.relationship(
+        'Requerente',
+        backref='atualizador',
+        lazy=True,
+        foreign_keys='Requerente.atualizado_por'
+    )
+    
+    ordens_criadas = db.relationship(
+        'OrdemServico',
+        backref='criador',
+        lazy=True,
+        foreign_keys='OrdemServico.criado_por'
+    )
+    ordens_atualizadas = db.relationship(
+        'OrdemServico',
+        backref='atualizador',
+        lazy=True,
+        foreign_keys='OrdemServico.atualizado_por'
+    )
+    
+    vistorias = db.relationship(
+        'Vistoria',
+        backref='usuario',
+        lazy=True,
+        foreign_keys='Vistoria.user_id'
+    )
 
-    def __init__(self, nome, email, password, telefone=None, nivel=1, ativo=True):
-        self.nome = nome
+    def __init__(self, email, password, nome=None, telefone=None, nivel=1, ativo=True):
         self.email = email
         self.password = self.hash_password(password)
+        self.nome = nome
         self.telefone = telefone
         self.nivel = nivel
         self.ativo = ativo
@@ -67,6 +113,7 @@ class User(BaseModel, UserMixin, SecurityMixin):
         """Autentica usuário por email e senha"""
         user = cls.find_by_email(email)
         if user and user.check_password(password) and user.is_active():
+            user.update_last_login()
             return user
         return None
 
@@ -74,7 +121,7 @@ class User(BaseModel, UserMixin, SecurityMixin):
         """Converte para dicionário, excluindo dados sensíveis por padrão"""
         data = super().to_dict()
         if not include_sensitive:
-            data.pop('password', None)  # corrigido de 'senha' para 'password'
+            data.pop('password', None)
         return data
 
     def __repr__(self):

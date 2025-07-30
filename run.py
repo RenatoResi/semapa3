@@ -7,18 +7,22 @@ Arquivo principal de execução da aplicação
 
 import sys
 import os
-from app import create_app
-from config.settings import Config
 
-# Adicionar o diretório raiz ao path
+# Adicionar o diretório raiz ao path para facilitar imports relativos
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from app import create_app
+from config.settings import config
+
+# Definir dinamicamente o ambiente/configuração a ser usada
+config_name = os.environ.get('FLASK_CONFIG', 'default')
+app_config = config.get(config_name)
+
 try:
-    app = create_app(Config)
+    app = create_app(app_config)
     print("✅ Aplicação SEMAPA3 iniciada com sucesso!")
     print("🌐 Acesse: http://localhost:5000")
     print("👤 Login padrão: admin@semapa.gov.br / 123456")
-    
 except Exception as e:
     print(f"❌ Erro ao iniciar aplicação: {e}")
     sys.exit(1)

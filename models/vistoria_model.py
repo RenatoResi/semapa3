@@ -1,86 +1,101 @@
 # -*- coding: utf-8 -*-
 """
 SEMAPA3 - Vistoria Model
-Modelo para gerenciamento de vistorias técnicas
+Modelo de vistoria ajustado conforme DDL da tabela vistoria
 """
 
 from core.database import db, BaseModel
 from datetime import datetime
-import os
+
 
 class Vistoria(BaseModel):
     """Modelo de vistoria técnica"""
-    __tablename__ = 'vistorias'
+    __tablename__ = 'vistoria'
 
-    numero = db.Column(db.String(20), unique=True, nullable=False, index=True)
-    arvore_id = db.Column(db.Integer, db.ForeignKey('arvores.id'), nullable=False)
-    ordem_servico_id = db.Column(db.Integer, db.ForeignKey('ordens_servico.id'))
-    tecnico_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    data_vistoria = db.Column(db.Date, default=datetime.utcnow().date, nullable=False)
-    laudo = db.Column(db.Text, nullable=False)
-    recomendacoes = db.Column(db.Text)
-    fotos = db.Column(db.Text)  # JSON com paths das fotos
-    status = db.Column(db.String(20), default='realizada')
+    requerimento_id = db.Column(db.Integer, db.ForeignKey('requerimentos.id', ondelete='CASCADE'), nullable=False)
+    vistoria_data = db.Column(db.DateTime, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=False)
+    status = db.Column(db.String(30), nullable=False, default='Pendente')
+    observacoes = db.Column(db.Text, nullable=True)
+    especie_id = db.Column(db.Integer, db.ForeignKey('especies.id'), nullable=True)
+    condicoes = db.Column(db.Text, nullable=True)
+    conflitos = db.Column(db.Text, nullable=True)
+    risco_queda = db.Column(db.String(10), nullable=True)
+    diagnostico = db.Column(db.Text, nullable=True)
+    acao_recomendada = db.Column(db.String(20), nullable=True)
+    tipo_poda = db.Column(db.Text, nullable=True)
+    galhos_cortar = db.Column(db.Text, nullable=True)
+    medidas_seguranca = db.Column(db.Text, nullable=True)
+    observacoes_tecnicas = db.Column(db.Text, nullable=True)
 
-    def __init__(self, numero, arvore_id, tecnico_id, laudo, recomendacoes=None, 
-                 ordem_servico_id=None, fotos=None):
-        self.numero = numero
-        self.arvore_id = arvore_id
-        self.tecnico_id = tecnico_id
-        self.laudo = laudo
-        self.recomendacoes = recomendacoes
-        self.ordem_servico_id = ordem_servico_id
-        self.fotos = fotos
+    # Relacionamento com fotos
+    fotos = db.relationship('VistoriaFoto', backref='vistoria', lazy=True, cascade='all, delete-orphan')
+
+    def __init__(self, requerimento_id, user_id, vistoria_data=None, status='Pendente',
+                 observacoes=None, especie_id=None, condicoes=None, conflitos=None,
+                 risco_queda=None, diagnostico=None, acao_recomendada=None,
+                 tipo_poda=None, galhos_cortar=None, medidas_seguranca=None,
+                 observacoes_tecnicas=None):
+        self.requerimento_id = requerimento_id
+        self.user_id = user_id
+        self.vistoria_data = vistoria_data or datetime.utcnow()
+        self.status = status
+        self.observacoes = observacoes
+        self.especie_id = especie_id
+        self.condicoes = condicoes
+        self.conflitos = conflitos
+        self.risco_queda = risco_queda
+        self.diagnostico = diagnostico
+        self.acao_recomendada = acao_recomendada
+        self.tipo_poda = tipo_poda
+        self.galhos_cortar = galhos_cortar
+        self.medidas_seguranca = medidas_seguranca
+        self.observacoes_tecnicas = observacoes_tecnicas
 
     @classmethod
-    def generate_numero(cls):
-        """Gera número sequencial para vistoria"""
-        last_vistoria = cls.query.order_by(cls.id.desc()).first()
-        if last_vistoria:
-            last_num = int(last_vistoria.numero.split('/')[-1])
-            return f"VT/{datetime.now().year}/{last_num + 1:04d}"
-        return f"VT/{datetime.now().year}/0001"
+    def get_by_user(cls, user_id):
+        """Retorna vistorias por usuário"""
+        return cls.query.filter_by(user_id=user_id).order_by(cls.vistoria_data.desc()).all()
 
     @classmethod
-    def get_by_tecnico(cls, tecnico_id):
-        """Retorna vistorias por técnico"""
-        return cls.query.filter_by(tecnico_id=tecnico_id).order_by(cls.data_vistoria.desc()).all()
+    def get_by_status(cls, status):
+        """Retorna vistorias por status"""
+        return cls.query.filter_by(status=status).order_by(cls.vistoria_data.desc()).all()
 
     @classmethod
     def get_by_periodo(cls, data_inicio, data_fim):
         """Retorna vistorias por período"""
         return cls.query.filter(
-            cls.data_vistoria >= data_inicio,
-            cls.data_vistoria <= data_fim
-        ).order_by(cls.data_vistoria.desc()).all()
+            cls.vistoria_data >= data_inicio,
+            cls.vistoria_data <= data_fim
+        ).order_by(cls.vistoria_data.desc()).all()
 
-    def add_foto(self, foto_path):
-        """Adiciona foto à vistoria"""
-        import json
-        fotos_list = json.loads(self.fotos) if self.fotos else []
-        fotos_list.append(foto_path)
-        self.fotos = json.dumps(fotos_list)
+    def finalizar(self):
+        """Finaliza a vistoria"""
+        self.status = 'Finalizada'
         self.save()
 
-    def get_fotos(self):
-        """Retorna lista de fotos"""
-        import json
-        return json.loads(self.fotos) if self.fotos else []
+    def cancelar(self):
+        """Cancela a vistoria"""
+        self.status = 'Cancelada'
+        self.save()
 
-    def remove_foto(self, foto_path):
-        """Remove foto da vistoria"""
-        import json
-        fotos_list = json.loads(self.fotos) if self.fotos else []
-        if foto_path in fotos_list:
-            fotos_list.remove(foto_path)
-            # Remove arquivo físico
-            try:
-                if os.path.exists(foto_path):
-                    os.remove(foto_path)
-            except Exception:
-                pass
-            self.fotos = json.dumps(fotos_list)
-            self.save()
+    @property
+    def total_fotos(self):
+        """Retorna total de fotos da vistoria"""
+        return len(self.fotos)
+
+    @property
+    def pode_editar(self):
+        """Verifica se a vistoria pode ser editada"""
+        return self.status == 'Pendente'
+
+    def to_dict(self):
+        """Converte para dicionário"""
+        data = super().to_dict()
+        data['total_fotos'] = self.total_fotos
+        data['pode_editar'] = self.pode_editar
+        return data
 
     def __repr__(self):
-        return f'<Vistoria {self.numero}>'
+        return f'<Vistoria {self.id} - Req:{self.requerimento_id}>'
