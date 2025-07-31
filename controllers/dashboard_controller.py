@@ -29,13 +29,13 @@ def index():
 
     # Últimos requerimentos
     ultimos_requerimentos = Requerimento.query.order_by(
-        Requerimento.created_at.desc()
+        Requerimento.data_abertura.desc()
     ).limit(5).all()
 
     # Ordens de serviço pendentes
     ordens_pendentes = OrdemServico.query.filter_by(
         status='pendente'
-    ).order_by(OrdemServico.data_programada).limit(5).all()
+    ).order_by(OrdemServico.data_emissao).limit(5).all()
 
     return render_template('dashboard/index.html',
                          stats=stats,
