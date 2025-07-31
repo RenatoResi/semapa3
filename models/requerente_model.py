@@ -13,6 +13,7 @@ class Requerente(BaseModel):
     """Modelo de requerente"""
     __tablename__ = 'requerentes'
 
+    id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=True)
     telefone = db.Column(db.String(20), nullable=True)
     observacao = db.Column(db.Text, nullable=True)

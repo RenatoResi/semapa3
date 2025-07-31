@@ -13,6 +13,7 @@ class Arvore(BaseModel):
     """Modelo de árvore"""
     __tablename__ = 'arvores'
 
+    id = db.Column(db.Integer, primary_key=True)
     endereco = db.Column(db.String(200), nullable=True)
     bairro = db.Column(db.String(100), nullable=True)
     latitude = db.Column(db.String(20), nullable=True)  # varchar conforme DDL

@@ -71,29 +71,29 @@ def create_app(config_class):
             db.create_all()
             print("✅ Tabelas do banco criadas com sucesso!")
             # Criar usuário admin padrão se não existir
-            # create_default_admin()
+            create_default_admin()
         except Exception as e:
             print(f"❌ Erro ao criar tabelas: {e}")
             raise
 
     return app
 
-# def create_default_admin():
-#     """Cria usuário administrador padrão"""
-#     try:
-#         from models.user_model import User
+def create_default_admin():
+    """Cria usuário administrador padrão"""
+    try:
+        from models.user_model import User
 
-#         admin = User.query.filter_by(email='admin@semapa.gov.br').first()
-#         if not admin:
-#             admin = User(
-#                 email='admin@semapa.gov.br',
-#                 password='123456',
-#                 nome='Administrador',
-#                 nivel=4,  # Super admin
-#                 ativo=True
-#             )
-#             db.session.add(admin)
-#             db.session.commit()
-#             print("✅ Usuário admin padrão criado (admin@semapa.gov.br / 123456)")
-#     except Exception as e:
-#         print(f"❌ Erro ao criar admin padrão: {e}")
+        admin = User.query.filter_by(email='admin@semapa.gov.br').first()
+        if not admin:
+            admin = User(
+                email='admin@semapa.gov.br',
+                password='123456',
+                nome='Administrador',
+                nivel=4,  # Super admin
+                ativo=True
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("✅ Usuário admin padrão criado (admin@semapa.gov.br / 123456)")
+    except Exception as e:
+        print(f"❌ Erro ao criar admin padrão: {e}")

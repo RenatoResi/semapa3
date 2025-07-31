@@ -12,6 +12,7 @@ class Requerimento(BaseModel):
     """Modelo de requerimento"""
     __tablename__ = 'requerimentos'
 
+    id = db.Column(db.Integer, primary_key=True)
     numero = db.Column(db.String(20), unique=True, nullable=True, index=True)
     data_abertura = db.Column(db.DateTime, nullable=True)
     tipo = db.Column(db.Text, nullable=True)

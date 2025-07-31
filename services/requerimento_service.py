@@ -57,7 +57,7 @@ class RequerimentoService:
 
         # Atualizar campos
         for key, value in kwargs.items():
-            if hasattr(requerimento, key) and key not in ['id', 'numero', 'created_at']:
+            if hasattr(requerimento, key) and key not in ['id', 'numero', 'data_abertura']:
                 setattr(requerimento, key, value)
 
         return requerimento.save()

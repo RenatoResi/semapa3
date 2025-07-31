@@ -11,6 +11,7 @@ class VistoriaFoto(BaseModel):
     """Modelo de foto de vistoria"""
     __tablename__ = 'vistoria_foto'
 
+    id = db.Column(db.Integer, primary_key=True)
     vistoria_id = db.Column(db.Integer, db.ForeignKey('vistoria.id', ondelete='CASCADE'), nullable=False)
     arquivo_nome = db.Column(db.String(255), nullable=True)
     arquivo = db.Column(db.LargeBinary, nullable=False)

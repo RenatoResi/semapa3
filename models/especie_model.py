@@ -12,6 +12,7 @@ class Especie(BaseModel):
     """Modelo de espécie de árvore"""
     __tablename__ = 'especies'
 
+    id = db.Column(db.Integer, primary_key=True)
     nome_popular = db.Column(db.String(100), nullable=False, unique=True, index=True)
     nome_cientifico = db.Column(db.String(150), nullable=False, index=True)
     porte = db.Column(db.String(20), nullable=False)

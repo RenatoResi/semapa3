@@ -12,6 +12,7 @@ class Vistoria(BaseModel):
     """Modelo de vistoria técnica"""
     __tablename__ = 'vistoria'
 
+    id = db.Column(db.Integer, primary_key=True)
     requerimento_id = db.Column(db.Integer, db.ForeignKey('requerimentos.id', ondelete='CASCADE'), nullable=False)
     vistoria_data = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=False)

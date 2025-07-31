@@ -14,6 +14,7 @@ class User(BaseModel, UserMixin, SecurityMixin):
     """Modelo de usuário do sistema"""
     __tablename__ = 'users'
 
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False, index=True)
     password = db.Column(db.String(200), nullable=False)
     nome = db.Column(db.String(100), nullable=True)

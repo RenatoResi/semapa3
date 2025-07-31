@@ -12,6 +12,7 @@ class OrdemServico(BaseModel):
     """Modelo de ordem de serviço"""
     __tablename__ = 'ordens_servico'
 
+    id = db.Column(db.Integer, primary_key=True)
     numero = db.Column(db.String(20), unique=True, nullable=True, index=True)
     data_emissao = db.Column(db.DateTime, nullable=True)
     data_execucao = db.Column(db.DateTime, nullable=True)
