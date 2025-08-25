@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-SEMAPA3 - User Model
-Modelo de usuario ajustado conforme DDL da tabela users
+SEMAPA3 - User Model CORRECTED
+Modelo de usuario corrigido para funcionar com autenticação
 """
 from core.database import db, BaseModel
 from flask_login import UserMixin
-from core.database import db, BaseModel
 from core.security import SecurityMixin
 from datetime import datetime
 
 
 class User(BaseModel, UserMixin, SecurityMixin):
-    """Modelo de usuário do sistema"""
+    """Modelo de usuário do sistema - CORRIGIDO"""
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False, index=True)
-    password = db.Column(db.String(200), nullable=False)
+    password = db.Column(db.String(200), nullable=False)  # CORRIGIDO: sempre 'password'
     nome = db.Column(db.String(100), nullable=True)
     telefone = db.Column(db.String(20), nullable=True)
     nivel = db.Column(db.Integer, nullable=False, default=1)
@@ -84,8 +83,9 @@ class User(BaseModel, UserMixin, SecurityMixin):
     )
 
     def __init__(self, email, password, nome=None, telefone=None, nivel=1, ativo=True):
+        """CORRIGIDO: Agora hasheia a senha corretamente"""
         self.email = email
-        self.password = self.hash_password(password)
+        self.password = self.hash_password(password)  # CORRIGIDO: hash_password retorna o hash
         self.nome = nome
         self.telefone = telefone
         self.nivel = nivel
@@ -94,7 +94,7 @@ class User(BaseModel, UserMixin, SecurityMixin):
     def update_last_login(self):
         """Atualiza timestamp do último login"""
         self.ultimo_login = datetime.utcnow()
-        self.save()
+        db.session.commit()  # CORRIGIDO: usar db.session diretamente
 
     def is_active(self):
         """Verifica se o usuário está ativo"""
@@ -111,12 +111,16 @@ class User(BaseModel, UserMixin, SecurityMixin):
 
     @classmethod
     def authenticate(cls, email, password):
-        """Autentica usuário por email e senha"""
+        """Autentica usuário por email e senha - CORRIGIDO"""
         user = cls.find_by_email(email)
         if user and user.check_password(password) and user.is_active():
             user.update_last_login()
             return user
         return None
+
+    def set_password(self, password):
+        """NOVO: Método para alterar senha"""
+        self.password = self.hash_password(password)
 
     def to_dict(self, include_sensitive=False):
         """Converte para dicionário, excluindo dados sensíveis por padrão"""

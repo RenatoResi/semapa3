@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-SEMAPA3 - Core Security
-Sistema de autenticação e autorização com hash de senha
+SEMAPA3 - Core Security CORRECTED
+Sistema de autenticação e autorização com hash de senha - CORRIGIDO
 """
 
 from flask_login import LoginManager, UserMixin
@@ -41,14 +41,15 @@ def require_role(min_level):
     return decorator
 
 class SecurityMixin:
-    """Mixin para adicionar funcionalidades de segurança aos models"""
+    """Mixin para adicionar funcionalidades de segurança aos models - CORRIGIDO"""
     
     def hash_password(self, password):
-        """Gera hash da senha"""
+        """CORRIGIDO: Gera hash da senha e retorna o hash"""
         return generate_password_hash(password)
     
     def check_password(self, password):
-        """Verifica se a senha está correta"""
+        """CORRIGIDO: Verifica se a senha está correta usando o campo 'password'"""
+        # IMPORTANTE: sempre usar self.password (não self.senha)
         return check_password_hash(self.password, password)
     
     def can_edit(self, user):

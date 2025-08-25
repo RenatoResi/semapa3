@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-SEMAPA3 - Application Factory
-Configuração principal da aplicação Flask usando Factory Pattern
+SEMAPA3 - Application Factory CORRECTED
+Configuração principal da aplicação Flask - CORRIGIDA
 """
 
 from flask import Flask
@@ -10,7 +10,7 @@ from core.security import login_manager, csrf
 from core.exceptions import register_error_handlers
 
 def create_app(config_class):
-    """Factory para criar instância da aplicação Flask"""
+    """Factory para criar instância da aplicação Flask - CORRIGIDA"""
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -70,8 +70,10 @@ def create_app(config_class):
             )
             db.create_all()
             print("✅ Tabelas do banco criadas com sucesso!")
-            # Criar usuário admin padrão se não existir
+            
+            # CORRIGIDO: Usar AuthService para criar admin padrão
             create_default_admin()
+            
         except Exception as e:
             print(f"❌ Erro ao criar tabelas: {e}")
             raise
@@ -79,21 +81,9 @@ def create_app(config_class):
     return app
 
 def create_default_admin():
-    """Cria usuário administrador padrão"""
+    """CORRIGIDO: Usa AuthService para criar usuário administrador padrão"""
     try:
-        from models.user_model import User
-
-        admin = User.query.filter_by(email='admin@semapa.gov.br').first()
-        if not admin:
-            admin = User(
-                email='admin@semapa.gov.br',
-                password='123456',
-                nome='Administrador',
-                nivel=4,  # Super admin
-                ativo=True
-            )
-            db.session.add(admin)
-            db.session.commit()
-            print("✅ Usuário admin padrão criado (admin@semapa.gov.br / 123456)")
+        from services.auth_service import AuthService
+        AuthService.create_default_admin()
     except Exception as e:
         print(f"❌ Erro ao criar admin padrão: {e}")
