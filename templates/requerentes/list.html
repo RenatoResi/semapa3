@@ -1,11 +1,15 @@
-{% extends "shared/base.html" %}
+{% extends "base.html" %}
 {% block content %}
   <h1>Requerentes</h1>
-  <a href="{{ url_for('requerentes.create') }}" class="btn btn-success mb-2">Novo Requerente</a>
-  <table class="table">
+
+  <input type="text" id="searchInput" class="form-control mb-2" placeholder="Buscar..." autocomplete="off" value="{{ search }}">
+
+  <a href="{{ url_for('requerente.novo') }}" class="btn btn-success mb-2">Novo Requerente</a>
+  
+  <table class="table" id="requerentesTable">
     <thead>
       <tr>
-        <th>ID</th><th>Nome</th><th>Tipo</th><th>Ações</th>
+        <th>ID</th><th>Nome</th><th>Telefone</th><th>Observações</th><th>Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -13,13 +17,74 @@
         <tr>
           <td>{{ req.id }}</td>
           <td>{{ req.nome }}</td>
-          <td>{{ req.tipo }}</td>
+          <td>{{ req.telefone }}</td>
+          <td>{{ req.observacao }}</td>
           <td>
-            <a href="{{ url_for('requerentes.detail', id=req.id) }}" class="btn btn-info btn-sm">Detalhes</a>
-            <a href="{{ url_for('requerentes.edit', id=req.id) }}" class="btn btn-warning btn-sm">Editar</a>
+            <a href="{{ url_for('requerente.detail', id=req.id) }}" class="btn btn-info btn-sm">Detalhes</a>
+            <a href="{{ url_for('requerente.edit', id=req.id) }}" class="btn btn-warning btn-sm">Editar</a>
           </td>
         </tr>
+      {% else %}
+        <tr><td colspan="5" class="text-center">Nenhum registro encontrado.</td></tr>
       {% endfor %}
     </tbody>
   </table>
+
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      Página {{ page }} de {{ total_pages }} - Total de registros: {{ total }}
+    </div>
+    <div>
+      {% if page > 1 %}
+        <a href="{{ url_for('requerente.index', page=page-1, search=search) }}" class="btn btn-secondary btn-sm">Anterior</a>
+      {% else %}
+        <button class="btn btn-secondary btn-sm" disabled>Anterior</button>
+      {% endif %}
+
+      {% if page < total_pages %}
+        <a href="{{ url_for('requerente.index', page=page+1, search=search) }}" class="btn btn-secondary btn-sm">Próximo</a>
+      {% else %}
+        <button class="btn btn-secondary btn-sm" disabled>Próximo</button>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('searchInput');
+    const tableBody = document.querySelector('#requerentesTable tbody');
+
+    input.addEventListener('input', function() {
+      const query = input.value;
+
+      fetch(`/requerentes/search?search=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+          tableBody.innerHTML = '';
+
+          if (data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Nenhum registro encontrado.</td></tr>';
+          } else {
+            data.forEach(r => {
+              const row = `<tr>
+                <td>${r.id}</td>
+                <td>${r.nome}</td>
+                <td>${r.telefone}</td>
+                <td>${r.observacao || ''}</td>
+                <td>
+                  <a href="/requerentes/${r.id}" class="btn btn-info btn-sm">Detalhes</a>
+                  <a href="/requerentes/${r.id}/editar" class="btn btn-warning btn-sm">Editar</a>
+                </td>
+              </tr>`;
+              tableBody.insertAdjacentHTML('beforeend', row);
+            });
+          }
+        })
+        .catch(err => {
+          console.error('Erro ao buscar:', err);
+        });
+    });
+  });
+  </script>
+
 {% endblock %}

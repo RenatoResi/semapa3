@@ -34,7 +34,7 @@ def index():
 
     # Ordens de serviço pendentes
     ordens_pendentes = OrdemServico.query.filter_by(
-        status='pendente'
+        status='aberto'
     ).order_by(OrdemServico.data_emissao).limit(5).all()
 
     return render_template('dashboard/index.html',

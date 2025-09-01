@@ -1,12 +1,19 @@
-{% extends "shared/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Requerimentos{% endblock %}
 
 {% block content %}
 <h1>Requerimentos</h1>
-<a href="{{ url_for('requerimento.create') }}" class="btn btn-success mb-3">Novo Requerimento</a>
 
-<table class="table table-striped">
+<div class="mb-3">
+  <a href="{{ url_for('requerimento.novo') }}" class="btn btn-success">Novo Requerimento</a>
+</div>
+
+<div class="mb-3">
+  <input type="text" id="searchInput" class="form-control" placeholder="Buscar por número..." autocomplete="off" value="{{ search }}">
+</div>
+
+<table class="table table-striped" id="requerimentosTable">
   <thead>
     <tr>
       <th>ID</th>
@@ -20,25 +27,85 @@
   </thead>
   <tbody>
     {% for req in requerimentos %}
-      <tr>
-        <td>{{ req.id }}</td>
-        <td>{{ req.numero or '-' }}</td>
-        <td>{{ req.tipo or '-' }}</td>
-        <td>{{ req.status or '-' }}</td>
-        <td>{{ req.prioridade or '-' }}</td>
-        <td>{{ req.data_abertura.strftime('%d/%m/%Y') if req.data_abertura else '-' }}</td>
-        <td>
-          <a href="{{ url_for('requerimento.detail', id=req.id) }}" class="btn btn-info btn-sm">Detalhes</a>
-          {% if req.pode_editar %}
-            <a href="{{ url_for('requerimento.edit', id=req.id) }}" class="btn btn-warning btn-sm">Editar</a>
-          {% endif %}
-        </td>
-      </tr>
+    <tr>
+      <td>{{ req.id }}</td>
+      <td>{{ req.numero or '-' }}</td>
+      <td>{{ req.tipo or '-' }}</td>
+      <td>{{ req.status or '-' }}</td>
+      <td>{{ req.prioridade or '-' }}</td>
+      <td>{{ req.data_abertura.strftime('%d/%m/%Y') if req.data_abertura else '-' }}</td>
+      <td>
+        <a href="{{ url_for('requerimento.detalhes', id=req.id) }}" class="btn btn-info btn-sm">Detalhes</a>
+        {% if req.pode_editar %}
+        <a href="{{ url_for('requerimento.editar', id=req.id) }}" class="btn btn-warning btn-sm">Editar</a>
+        {% endif %}
+      </td>
+    </tr>
     {% else %}
-      <tr>
-        <td colspan="7" class="text-center">Nenhum requerimento encontrado.</td>
-      </tr>
+    <tr>
+      <td colspan="7" class="text-center">Nenhum requerimento encontrado.</td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+  <div>
+    Página {{ page }} de {{ total_pages }} - Total de registros: {{ total }}
+  </div>
+  <div>
+    {% if page > 1 %}
+      <a href="{{ url_for('requerimento.index', page=page-1, search=search) }}" class="btn btn-secondary btn-sm">Anterior</a>
+    {% else %}
+      <button class="btn btn-secondary btn-sm" disabled>Anterior</button>
+    {% endif %}
+
+    {% if page < total_pages %}
+      <a href="{{ url_for('requerimento.index', page=page+1, search=search) }}" class="btn btn-secondary btn-sm">Próximo</a>
+    {% else %}
+      <button class="btn btn-secondary btn-sm" disabled>Próximo</button>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('searchInput');
+  const tableBody = document.querySelector('#requerimentosTable tbody');
+
+  input.addEventListener('input', function() {
+    const query = input.value;
+
+    fetch(`/requerimentos/api/buscar?term=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        tableBody.innerHTML = '';
+
+        if (data.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhum requerimento encontrado.</td></tr>';
+        } else {
+          data.forEach(r => {
+            const row = `<tr>
+              <td>${r.id}</td>
+              <td>${r.label}</td>
+              <td>${r.tipo || '-'}</td>
+              <td>${r.status || '-'}</td>
+              <td>-</td>
+              <td>-</td>
+              <td>
+                <a href="/requerimentos/${r.id}" class="btn btn-info btn-sm">Detalhes</a>
+                <a href="/requerimentos/${r.id}/editar" class="btn btn-warning btn-sm">Editar</a>
+              </td>
+            </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Erro ao buscar:', err);
+      });
+  });
+});
+</script>
+
 {% endblock %}

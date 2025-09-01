@@ -23,6 +23,7 @@ class Config:
     # Banco de Dados
     BASE_DIR = BASE_DIR
     DATABASE_PATH = BASE_DIR / 'semapa.db'
+    # Prioriza a DATABASE_URL do .env, mas usa o semapa.db local como fallback.
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f"sqlite:///{DATABASE_PATH}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = DEBUG
