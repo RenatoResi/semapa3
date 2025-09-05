@@ -223,4 +223,19 @@ def atualizar(id):
         flash('Erro ao atualizar requerimento', 'error')
         return redirect(url_for('requerimento.editar', id=id))
 
-# Adicione outras rotas conforme funcionalidade do módulo
+@requerimento_bp.route('/api/buscar')
+@login_required
+@require_role(1)
+def buscar_api():
+    term = request.args.get('term', '').strip()
+    results = RequerimentoService.search(term)
+    # Retorne uma lista de dicts com os campos necessários
+    return jsonify([
+        {
+            'label': r.numero,
+            'tipo': r.tipo,
+            'status': r.status,
+            'prioridade': r.prioridade,
+            'data_abertura': r.data_abertura.strftime('%d/%m/%Y')
+        } for r in results
+    ])

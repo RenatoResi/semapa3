@@ -14,7 +14,6 @@
 <table class="table table-striped" id="requerimentosTable">
   <thead>
     <tr>
-      <th>ID</th>
       <th>Número</th>
       <th>Tipo</th>
       <th>Status</th>
@@ -26,7 +25,6 @@
   <tbody>
     {% for req in requerimentos %}
     <tr>
-      <td>{{ req.id }}</td>
       <td>{{ req.numero or '-' }}</td>
       <td>{{ req.tipo or '-' }}</td>
       <td>{{ req.status or '-' }}</td>
@@ -69,7 +67,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const input = document.getElementById('searchInput');
-  const tableBody = document.querySelector('#requerimentosTable tbody');
+  const tableBody = document.querySelector('#requerimentosTable tbody')
 
   input.addEventListener('input', function() {
     const query = input.value;
@@ -84,12 +82,11 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           data.forEach(r => {
             const row = `<tr>
-              <td>${r.id}</td>
               <td>${r.label}</td>
               <td>${r.tipo || '-'}</td>
               <td>${r.status || '-'}</td>
-              <td>-</td>
-              <td>-</td>
+              <td>${r.prioridade || '-'}</td>
+              <td>${r.data_abertura || '-'}</td>
               <td>
                 <a href="/requerimentos/${r.id}" class="btn btn-info btn-sm">Detalhes</a>
                 <a href="/requerimentos/${r.id}/editar" class="btn btn-warning btn-sm">Editar</a>

@@ -75,13 +75,23 @@ class RequerimentoService:
         return requerimento and requerimento.pode_editar
 
     @staticmethod
-    def search(term, limit=10):
-        if not term or len(term) < 2:
-            return []
-
-        ilike_term = f"%{term}%"
-        return Requerimento.query.filter(Requerimento.numero.ilike(ilike_term)).limit(limit).all()
-
+    def search(term, limit=50):
+        query = Requerimento.query
+        if term and len(term) >= 2:
+            ilike_term = f"%{term}%"
+            query = query.filter(
+                or_(
+                    Requerimento.numero.ilike(ilike_term),
+                    Requerimento.tipo.ilike(ilike_term),
+                    Requerimento.status.ilike(ilike_term),
+                    Requerimento.motivo.ilike(ilike_term),
+                    Requerimento.observacao.ilike(ilike_term),
+                    Requerimento.prioridade.ilike(ilike_term)
+                )
+            )
+        # Se o termo estiver vazio, retorna todos (limitados)
+        return query.order_by(Requerimento.data_abertura.desc()).limit(limit).all()
+    
     @staticmethod
     def get_paginated(page=1, per_page=10, status=None, tipo=None, requerente_id=None,
                       data_inicio=None, data_fim=None, search=None):
