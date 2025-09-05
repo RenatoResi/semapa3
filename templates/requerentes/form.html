@@ -2,17 +2,21 @@
 {% block content %}
   <h2>{{ 'Editar' if requerente else 'Novo' }} Requerente</h2>
   <form method="post">
-    <div class="form-group">
-      <label>Nome</label>
-      <input type="text" name="nome" class="form-control" value="{{ requerente.nome if requerente else '' }}" required>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="nome">Nome</label>
+            <input id="nome" name="nome" type="text" required>
+            <div id="nome-erro" class="erro-mensagem" style="display:none;"></div>
+        </div>
+        <div class="form-group">
+            <label for="telefone">Telefone</label>
+            <input id="telefone" name="telefone" type="tel" oninput="formatarTelefone(this)" maxlength="15">
+        </div>
     </div>
     <div class="form-group">
-      <label>Tipo</label>
-      <select name="tipo" class="form-control">
-        <option value="PF" {% if requerente and requerente.tipo == 'PF' %}selected{% endif %}>Pessoa Física</option>
-        <option value="PJ" {% if requerente and requerente.tipo == 'PJ' %}selected{% endif %}>Pessoa Jurídica</option>
-      </select>
+        <label for="observacao-requerente">Observação</label>
+        <input id="observacao-requerente" name="observacao" type="text">
     </div>
-    <button type="submit" class="btn btn-success">Salvar</button>
+    <button type="submit">Cadastrar</button>
   </form>
 {% endblock %}

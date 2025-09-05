@@ -35,4 +35,49 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // Você pode adicionar seus scripts personalizados abaixo...
+
+  function formatarTelefone(campo) {
+      let valor = campo.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+      let formato = '';
+
+      if (valor.length <= 10) { // Formato para telefone fixo (XX XXXX-XXXX)
+          formato = valor.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
+      } else { // Formato para celular (XX XXXXX-XXXX)
+          formato = valor.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
+      }
+
+      campo.value = formato;
+  }
+
+  // Verificar se o requerente já existe
+  document.addEventListener('DOMContentLoaded', function() {
+      const nomeInput = document.getElementById('nome');
+      const erroDiv = document.getElementById('nome-erro');
+
+      nomeInput.addEventListener('blur', function() {
+          const nome = nomeInput.value.trim();
+          if (nome.length < 3) {
+              nomeInput.classList.remove('erro');
+              erroDiv.style.display = 'none';
+              return;
+          }
+          fetch(`/api/requerente/existe?nome=${encodeURIComponent(nome)}`)
+              .then(response => response.json())
+              .then(data => {
+                  if (data.exists) {
+                      nomeInput.classList.add('erro');
+                      erroDiv.textContent = `Esse requerente já existe (id=${data.id})`;
+                      erroDiv.style.display = 'block';
+                  } else {
+                      nomeInput.classList.remove('erro');
+                      erroDiv.style.display = 'none';
+                  }
+              })
+              .catch(() => {
+                  nomeInput.classList.remove('erro');
+                  erroDiv.style.display = 'none';
+              });
+      });
+  });
+  
 });

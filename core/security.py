@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 SEMAPA3 - Core Security CORRECTED
-Sistema de autenticação e autorização com hash de senha - CORRIGIDO
+Sistema de autenticação e autorização com bcrypt - CORRIGIDO
 """
 
 from flask_login import LoginManager, UserMixin
@@ -9,7 +9,7 @@ from flask_wtf.csrf import CSRFProtect
 from functools import wraps
 from flask import abort
 from flask_login import current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+import bcrypt  # MUDANÇA: Usar bcrypt em vez de werkzeug
 
 # Instâncias globais
 login_manager = LoginManager()
@@ -23,7 +23,6 @@ login_manager.login_message_category = 'info'
 @login_manager.user_loader
 def load_user(user_id):
     """Carrega usuário pelo ID"""
-    # Import local para evitar importação circular
     from models.user_model import User
     return User.query.get(int(user_id))
 
@@ -44,18 +43,20 @@ class SecurityMixin:
     """Mixin para adicionar funcionalidades de segurança aos models - CORRIGIDO"""
     
     def hash_password(self, password):
-        """CORRIGIDO: Gera hash da senha e retorna o hash"""
-        return generate_password_hash(password)
+        """CORRIGIDO: Usa bcrypt para compatibilidade com banco legado"""
+        return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
     
     def check_password(self, password):
-        """CORRIGIDO: Verifica se a senha está correta usando o campo 'password'"""
-        # IMPORTANTE: sempre usar self.password (não self.senha)
-        return check_password_hash(self.password, password)
+        """CORRIGIDO: Usa bcrypt para verificar senha"""
+        try:
+            return bcrypt.checkpw(password.encode(), self.password.encode())
+        except Exception:
+            return False
     
     def can_edit(self, user):
         """Verifica se usuário pode editar este registro"""
-        return user.nivel >= 2 or getattr(self, 'criado_por', None) == user.id
+        return user.nivel <= 2 or getattr(self, 'criado_por', None) == user.id
     
     def can_delete(self, user):
         """Verifica se usuário pode deletar este registro"""
-        return user.nivel >= 3 or getattr(self, 'criado_por', None) == user.id
+        return user.nivel <= 3 or getattr(self, 'criado_por', None) == user.id

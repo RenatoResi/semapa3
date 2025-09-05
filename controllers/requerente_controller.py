@@ -39,13 +39,13 @@ def index():
 
 @requerente_bp.route('/novo')
 @login_required
-@require_role(2)
+@require_role(1)
 def novo():
     return render_template('requerentes/form.html', requerente=None)
 
 @requerente_bp.route('/criar', methods=['POST'])
 @login_required
-@require_role(2)
+@require_role(1)
 def criar():
     try:
         data = {
@@ -92,7 +92,7 @@ def detail(id):
 
 @requerente_bp.route('/<int:id>/editar')
 @login_required
-@require_role(2)
+@require_role(1)
 def edit(id):
     try:
         requerente = RequerenteService.get_by_id(id)
