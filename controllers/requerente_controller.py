@@ -90,7 +90,7 @@ def detail(id):
         flash('Erro ao carregar requerente', 'error')
         return redirect(url_for('requerente.index'))
 
-@requerente_bp.route('/<int:id>/editar')
+@requerente_bp.route('/<int:id>/editar', methods=['GET', 'POST'])
 @login_required
 @require_role(1)
 def edit(id):
@@ -100,6 +100,31 @@ def edit(id):
             flash('Requerente não encontrado', 'error')
             return redirect(url_for('requerente.index'))
 
+        if request.method == 'POST':
+            print(request.form)
+            nome = request.form.get('nome', '').strip()
+            telefone = request.form.get('telefone', '').strip()
+            observacao = request.form.get('observacao', '').strip()
+
+            if not nome:
+                flash('Nome é obrigatório', 'error')
+                return render_template('requerentes/form.html', requerente=requerente), 400
+
+            try:
+                RequerenteService.update(
+                    requerente_id=id,
+                    nome=nome,
+                    telefone=telefone,
+                    observacao=observacao
+                )
+                flash('Requerente atualizado com sucesso!', 'success')
+                return redirect(url_for('requerente.detail', id=id))
+            except Exception as e:
+                current_app.logger.error(f"Erro ao atualizar requerente {id}: {str(e)}")
+                flash('Erro ao atualizar requerente', 'error')
+                return render_template('requerentes/form.html', requerente=requerente), 500
+
+        # GET: exibe o formulário preenchido
         return render_template('requerentes/form.html', requerente=requerente)
 
     except Exception as e:
