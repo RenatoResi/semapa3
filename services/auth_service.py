@@ -102,27 +102,27 @@ class AuthService:
         # Por simplicidade, retornamos apenas sucesso
         return True
     
-    @staticmethod
-    def create_default_admin():
-        """NOVO: Cria usuário admin padrão se não existir"""
-        try:
-            admin = User.query.filter_by(email='admin@semapa.gov.br').first()
-            if not admin:
-                admin = User(
-                    email='admin@semapa.gov.br',
-                    password='123456',  # Será hasheada no __init__
-                    nome='Administrador',
-                    nivel=4,  # Super admin
-                    ativo=True
-                )
-                db.session.add(admin)
-                db.session.commit()
-                print("✅ Usuário admin padrão criado (admin@semapa.gov.br / 123456)")
-                return admin
-            else:
-                print("✅ Usuário admin já existe")
-                return admin
-        except Exception as e:
-            db.session.rollback()
-            print(f"❌ Erro ao criar admin padrão: {e}")
-            raise
+    # @staticmethod
+    # def create_default_admin():
+    #     """NOVO: Cria usuário admin padrão se não existir"""
+    #     try:
+    #         admin = User.query.filter_by(email='admin@semapa.gov.br').first()
+    #         if not admin:
+    #             admin = User(
+    #                 email='admin@semapa.gov.br',
+    #                 password='123456',  # Será hasheada no __init__
+    #                 nome='Administrador',
+    #                 nivel=4,  # Super admin
+    #                 ativo=True
+    #             )
+    #             db.session.add(admin)
+    #             db.session.commit()
+    #             print("✅ Usuário admin padrão criado (admin@semapa.gov.br / 123456)")
+    #             return admin
+    #         else:
+    #             print("✅ Usuário admin já existe")
+    #             return admin
+    #     except Exception as e:
+    #         db.session.rollback()
+    #         print(f"❌ Erro ao criar admin padrão: {e}")
+    #         raise

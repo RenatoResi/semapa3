@@ -5,7 +5,7 @@ Núcleo da aplicação com funcionalidades essenciais
 """
 
 from .database import db, BaseModel
-from .security import login_manager, require_role, SecurityMixin
+from .security import login_manager, csrf, require_role, SecurityMixin
 from .exceptions import (
     SemapaException, 
     ValidationError, 

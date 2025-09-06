@@ -6,7 +6,7 @@ Configuração principal da aplicação Flask - CORRIGIDA
 
 from flask import Flask
 from core.database import db
-from core.security import login_manager
+from core.security import login_manager, csrf
 from core.exceptions import register_error_handlers
 
 def create_app(config_class):
@@ -17,6 +17,7 @@ def create_app(config_class):
     # Inicializar extensões
     db.init_app(app)
     login_manager.init_app(app)
+    csrf.init_app(app)
 
     # Inicializar configurações customizadas (uploads etc)
     if hasattr(config_class, 'init_app'):
@@ -71,7 +72,7 @@ def create_app(config_class):
             print("✅ Tabelas do banco criadas com sucesso!")
             
             # CORRIGIDO: Usar AuthService para criar admin padrão
-            create_default_admin()
+            # create_default_admin()
             
         except Exception as e:
             print(f"❌ Erro ao criar tabelas: {e}")
@@ -79,10 +80,10 @@ def create_app(config_class):
 
     return app
 
-def create_default_admin():
-    """CORRIGIDO: Usa AuthService para criar usuário administrador padrão"""
-    try:
-        from services.auth_service import AuthService
-        AuthService.create_default_admin()
-    except Exception as e:
-        print(f"❌ Erro ao criar admin padrão: {e}")
+# def create_default_admin():
+#     """CORRIGIDO: Usa AuthService para criar usuário administrador padrão"""
+#     try:
+#         from services.auth_service import AuthService
+#         AuthService.create_default_admin()
+#     except Exception as e:
+#         print(f"❌ Erro ao criar admin padrão: {e}")

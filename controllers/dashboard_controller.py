@@ -25,6 +25,20 @@ def index():
     }
 
     # Estatísticas de requerimentos
+    total_requerimentos = Requerimento.query.count()
+    pendentes = Requerimento.query.filter(
+        Requerimento.status.in_(["aberto", "pendente"])
+    ).count()
+    concluidos = Requerimento.query.filter_by(status="concluido").count()
+    negados = Requerimento.query.filter_by(status="negado").count()
+
+    req_stats = {
+        "total": total_requerimentos,
+        "pendentes": pendentes,
+        "concluidos": concluidos,
+        "negados": negados,
+    }
+
     req_stats = RequerimentoService.get_statistics()
 
     # Últimos requerimentos
@@ -32,9 +46,13 @@ def index():
         Requerimento.data_abertura.desc()
     ).limit(5).all()
 
-    # Ordens de serviço pendentes
-    ordens_pendentes = OrdemServico.query.filter_by(
-        status='aberto'
+    # ultimos_requerimentos = Requerimento.query.filter(
+    #     Requerimento.status.in_(["aberto", "pendente"])
+    # ).order_by(Requerimento.data_abertura.desc()).limit(5).all()
+
+    # Ordens de serviço pendentes (tudo que não for concluído)
+    ordens_pendentes = OrdemServico.query.filter(
+        OrdemServico.status != "concluído"
     ).order_by(OrdemServico.data_emissao).limit(5).all()
 
     return render_template('dashboard/index.html',

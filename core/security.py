@@ -5,6 +5,7 @@ Sistema de autenticação e autorização com bcrypt - CORRIGIDO
 """
 
 from flask_login import LoginManager, UserMixin
+from flask_wtf.csrf import CSRFProtect
 from functools import wraps
 from flask import abort
 from flask_login import current_user
@@ -12,6 +13,7 @@ import bcrypt  # MUDANÇA: Usar bcrypt em vez de werkzeug
 
 # Instâncias globais
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 # Configurações do Flask-Login
 login_manager.login_view = 'auth.login'
