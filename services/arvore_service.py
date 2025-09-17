@@ -82,7 +82,7 @@ class ArvoreService:
         if query:
             arvores = Arvore.search(query)
         else:
-            arvores = Arvore.query.order_by(Arvore.numero).all()
+            arvores = Arvore.query.order_by(Arvore.endereco).all()
 
         # Paginação manual
         start = (page - 1) * per_page
@@ -109,3 +109,8 @@ class ArvoreService:
                 kml_data.append(arvore.to_kml_dict())
 
         return kml_data
+    
+    @staticmethod
+    def get_all():
+        """Retorna todas as árvores ordenadas por endereço"""
+        return Arvore.query.order_by(Arvore.endereco).all()

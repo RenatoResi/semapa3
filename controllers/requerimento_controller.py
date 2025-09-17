@@ -11,7 +11,7 @@ from utils.helpers import allowed_file, save_uploaded_file
 
 requerimento_bp = Blueprint('requerimento', __name__, url_prefix='/requerimentos')
 
-@requerimento_bp.route('/')
+@requerimento_bp.route('/', endpoint='index')
 @login_required
 @require_role(1)
 def index():
