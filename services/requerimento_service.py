@@ -42,7 +42,7 @@ class RequerimentoService:
             tipo=tipo,
             motivo=descricao,
             observacao=observacoes,
-            status='pendente',
+            status='aberto',
             data_abertura=None
         )
         return requerimento.save()
@@ -131,10 +131,10 @@ class RequerimentoService:
         """Retorna estatísticas dos requerimentos"""
         return {
             'total': Requerimento.query.count(),
-            'pendentes': Requerimento.query.filter_by(status='aberto').count(),
+            'pendentes' : Requerimento.query.filter(Requerimento.status != "Concluído").count(),
             'aprovados': Requerimento.query.filter_by(status='aprovado').count(),
             'negados': Requerimento.query.filter_by(status='negado').count(),
-            'concluidos': Requerimento.query.filter_by(status='concluido').count()
+            'concluidos': Requerimento.query.filter_by(status='Concluído').count()
         }
     
     # Adicione outros métodos conforme necessidade, por exemplo approve, reject etc.

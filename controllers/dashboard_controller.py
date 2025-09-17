@@ -27,15 +27,15 @@ def index():
     # Estatísticas de requerimentos
     total_requerimentos = Requerimento.query.count()
     pendentes = Requerimento.query.filter(
-        Requerimento.status.in_(["aberto", "pendente"])
+        Requerimento.status.in_(["Aberto", "Pendente"])
     ).count()
-    concluidos = Requerimento.query.filter_by(status="concluido").count()
-    negados = Requerimento.query.filter_by(status="negado").count()
+    concluidos = Requerimento.query.filter_by(status="Concluído").count()
+    negados = Requerimento.query.filter_by(status="Negado").count()
 
     req_stats = {
         "total": total_requerimentos,
         "pendentes": pendentes,
-        "concluidos": concluidos,
+        "concluídos": concluidos,
         "negados": negados,
     }
 
